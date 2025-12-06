@@ -1,4 +1,4 @@
-package in.resuforge.api.Util;
+package in.resuforge.api.Utils;
 
 public class AppConstants {
     public static final String AUTH_CONTROLLER = "/api/auth";
