@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${subject}">Candidate Resume</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 28px;
+        }
+
+        .content p {
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 12px 0;
+        }
+
+        .attachment-box {
+            margin: 22px 0;
+            padding: 14px;
+            background-color: #f1f3f5;
+            border-left: 4px solid #2c3e50;
+            border-radius: 4px;
+        }
+
+        .footer {
+            background-color: #f4f6f8;
+            padding: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <h2>Candidate Application</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="content">
+        <p>Dear Hiring Manager,</p>
+
+        <p th:text="${message}">
+            Please find the attached resume for your review.
+        </p>
+
+        <div class="attachment-box">
+            <strong>📎 Attached Resume:</strong>
+            <span th:text="${fileName}">Candidate_Resume.pdf</span>
+        </div>
+
+        <p>
+            This resume was generated and shared via <strong>ResuForge</strong>,
+            a professional resume-building platform.
+        </p>
+
+        <p>
+            Thank you for your time and consideration.
+        </p>
+
+        <p>
+            Kind regards,<br/>
+            <strong>ResuForge Team</strong>
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        © <span th:text="${T(java.time.Year).now()}">2026</span> ResuForge
+    </div>
+
+</div>
+
+</body>
+</html>
