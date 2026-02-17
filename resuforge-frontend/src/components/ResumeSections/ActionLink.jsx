@@ -15,4 +15,4 @@ const ActionLink = ({icon, link, bgColor}) => {
   )
 }
 
-export default ActionLink
+export default ActionLink;
