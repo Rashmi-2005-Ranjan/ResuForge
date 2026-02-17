@@ -1,8 +1,10 @@
 package in.resuforge.api.Controller;
 
+import in.resuforge.api.Document.User;
 import in.resuforge.api.Service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -26,9 +28,18 @@ import static in.resuforge.api.Utils.AppConstants.SEND_RESUME_WITH_EMAIL;
 @Slf4j
 public class EmailController {
     private final EmailService emailService;
+    @Value("${spring.mail.host}")
+    private String defaultReplyToEmail;
 
     @PostMapping(value = SEND_RESUME_WITH_EMAIL, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> sendResumeByEmail(@RequestPart("recipientEmail") String recipientEmail , @RequestPart("subject") String subject , @RequestPart("message") String message , @RequestPart("pdfFile") MultipartFile pdfFile , Authentication authentication) throws IOException {
+        User user = (User) authentication.getPrincipal ( );
+        log.info ( "Current logged-in user details to access direct resume send feature: {}" , user );
+        String replyToEmail = defaultReplyToEmail;
+        if (Objects.nonNull ( user )) {
+            log.info ( "Inside EmailController: sendResumeByEmail() --- Where User Email: {}" , user.getEmail ( ) );
+            replyToEmail = user.getEmail ( );
+        }
         //Step 1: Validate the inputs
         Map<String, Object> response = new HashMap<> ( );
         if (Objects.isNull ( recipientEmail ) || Objects.isNull ( pdfFile )) {
@@ -44,7 +55,7 @@ public class EmailController {
         String emailSubject = Objects.nonNull ( subject ) ? subject : "Job Application Form";
         String emailBody = Objects.nonNull ( message ) ? message : "Please find my attached resume";
         //Step 4: Call the service method to send email
-        emailService.sendEmailWithAttachment ( recipientEmail , emailSubject , pdfBytes , defaultFileName );
+        emailService.sendEmailWithAttachment ( recipientEmail , emailSubject , pdfBytes , defaultFileName , replyToEmail );
         //Step 5: Return Response
         response.put ( "success" , true );
         response.put ( "message" , "Resume send successfully to " + recipientEmail );
