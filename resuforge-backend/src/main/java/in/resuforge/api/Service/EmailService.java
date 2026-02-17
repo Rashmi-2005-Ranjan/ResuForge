@@ -56,11 +56,11 @@ public class EmailService {
             String to ,
             String subject ,
             byte[] attachment ,
-            String fileName
+            String fileName ,
+            String replyToEmail
     ) {
         try {
             log.info ( "Inside EmailService: sendEmailWithAttachment() to {}" , to );
-
             // Thymeleaf context for recruiter email
             Context context = new Context ( );
             context.setVariable ( "subject" , subject );
@@ -80,6 +80,7 @@ public class EmailService {
                     new MimeMessageHelper ( message , true , "UTF-8" );
 
             helper.setFrom ( fromEmail );
+            helper.setReplyTo ( replyToEmail );
             helper.setTo ( to );
             helper.setSubject ( subject );
             helper.setText ( htmlContent , true );
