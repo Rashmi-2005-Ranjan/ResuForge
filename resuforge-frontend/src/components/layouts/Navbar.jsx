@@ -13,7 +13,7 @@ const Navbar = () => {
                 <FileText className="w-4 h-4 text-white" />
               </div>
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Resume Builder
+              ResuForge
             </span>
             </h2>
           </Link>
