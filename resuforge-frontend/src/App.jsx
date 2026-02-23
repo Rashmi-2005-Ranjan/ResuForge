@@ -5,6 +5,7 @@ import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Home/Dashboard";
 import EditResume from "./pages/ResumeUpdate/EditResume";
 import UserProvider from "./context/userContext";
+import NotFound from "./pages/NotFound.jsx";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/resume/:resumeId" element={<EditResume />} />
+              <Route path="*" element={<NotFound/>}/>
           </Routes>
         </Router>
       </div>
