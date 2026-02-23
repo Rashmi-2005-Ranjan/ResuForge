@@ -1,76 +1,141 @@
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import { fixTailwindColors } from './helper';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { fixTailwindColors } from "./helper";
 
-// Size helpers
+/* ===========================
+   CONSTANTS
+=========================== */
 const MB = 1024 * 1024;
-const SIZE_LIMIT_MB = 18; // keep some headroom below 20MB SMTP limit
+const SIZE_LIMIT_MB = 18;
 
-// Sensible defaults
-const DEFAULTS = {
-  quality: 0.85, // JPEG quality (0..1)
-  scale: 2,      // html2canvas scale
-};
+/* ===========================
+   CORE GENERATOR
+=========================== */
+export const generatePDFFromElement = async function (
+    element,
+    filename,
+    options
+) {
+  if (!filename) filename = "resume.pdf";
+  if (!options) options = {};
 
-export const generatePDFFromElement = async (element, filename = 'resume.pdf', options = {}) => {
-  const quality = typeof options.quality === 'number' ? options.quality : DEFAULTS.quality;
-  const scale = typeof options.scale === 'number' ? options.scale : DEFAULTS.scale;
+  var quality =
+      typeof options.quality === "number" ? options.quality : 0.92;
 
-  let clone = null;
+  var scale =
+      typeof options.scale === "number"
+          ? options.scale
+          : Math.max(window.devicePixelRatio || 2, 4);
+
+  var clone = null;
+
   try {
-    // Clone the element so we don't mutate the live UI
+    /* ─────────────────────────────
+       1. CLONE AT TRUE A4 SIZE
+    ───────────────────────────── */
     clone = element.cloneNode(true);
-    clone.style.position = 'fixed';
-    clone.style.left = '-10000px';
-    clone.style.top = '0';
-    clone.style.background = '#ffffff';
-    clone.style.width = `${element.scrollWidth}px`;
+    clone.style.position = "fixed";
+    clone.style.left = "-99999px";
+    clone.style.top = "0";
+
+    /* 🔑 CRITICAL FIX */
+    clone.style.width = "210mm";
+    clone.style.maxWidth = "210mm";
+    clone.style.minWidth = "210mm";
+
+    clone.style.height = "auto";
+    clone.style.background = "#ffffff";
+    clone.style.transform = "none";
+    clone.style.zoom = "1";
+    clone.style.overflow = "visible";
 
     document.body.appendChild(clone);
 
-    // Tailwind v4 uses oklch colors that html2canvas can't parse; normalize to rgb
+    /* Fix Tailwind oklch colors */
     fixTailwindColors(clone);
 
-    // Render to canvas
-    const canvas = await html2canvas(clone, {
-      scale,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      width: clone.scrollWidth,
-      height: clone.scrollHeight,
-      scrollX: 0,
-      scrollY: 0,
+    /* Wait for layout & fonts */
+    await new Promise(function (resolve) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(resolve);
+      });
     });
 
-    // Convert to JPEG (much smaller than PNG)
-    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+    /* ─────────────────────────────
+       2. RENDER FULL CANVAS
+    ───────────────────────────── */
+    var canvas = await html2canvas(clone, {
+      scale: scale,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      allowTaint: true,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: clone.scrollWidth,
+      windowHeight: clone.scrollHeight
+    });
 
-    // Prepare PDF paging
-    const imgWidth = 210;  // A4 width in mm
-    const pageHeight = 295; // A4 height in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight;
+    /* ─────────────────────────────
+       3. SLICE INTO A4 PAGES
+    ───────────────────────────── */
+    var pdf = new jsPDF("p", "mm", "a4");
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    let position = 0;
+    var PAGE_W_MM = 210;
+    var PAGE_H_MM = 297;
 
-    // First page
-    pdf.addImage(dataUrl, 'JPEG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    var pxPerMM = canvas.width / PAGE_W_MM;
+    var pageHeightPx = PAGE_H_MM * pxPerMM;
 
-    // Additional pages (repeat image with offset)
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(dataUrl, 'JPEG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+    var y = 0;
+    var pageIndex = 0;
+
+    while (y < canvas.height) {
+      if (pageIndex > 0) {
+        pdf.addPage();
+      }
+
+      var sliceHeight = Math.min(
+          pageHeightPx,
+          canvas.height - y
+      );
+
+      var slice = document.createElement("canvas");
+      slice.width = canvas.width;
+      slice.height = sliceHeight;
+
+      var ctx = slice.getContext("2d");
+      ctx.drawImage(
+          canvas,
+          0,
+          y,
+          canvas.width,
+          sliceHeight,
+          0,
+          0,
+          canvas.width,
+          sliceHeight
+      );
+
+      var imgData = slice.toDataURL("image/jpeg", quality);
+      var sliceHeightMM = sliceHeight / pxPerMM;
+
+      pdf.addImage(
+          imgData,
+          "JPEG",
+          0,
+          0,
+          PAGE_W_MM,
+          sliceHeightMM
+      );
+
+      y += sliceHeight;
+      pageIndex++;
     }
 
     return pdf;
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    throw new Error('Failed to generate PDF');
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+    throw err;
   } finally {
     if (clone && clone.parentNode) {
       clone.parentNode.removeChild(clone);
@@ -78,27 +143,61 @@ export const generatePDFFromElement = async (element, filename = 'resume.pdf', o
   }
 };
 
-export const generatePDFBlob = async (element, options = {}) => {
-  // Try with provided or default settings
-  let pdf = await generatePDFFromElement(element, 'resume.pdf', options);
-  let blob = pdf.output('blob');
+/* ===========================
+   GENERATE BLOB (EMAIL)
+=========================== */
+export const generatePDFBlob = async function (element, options) {
+  if (!options) options = {};
 
-  // If still too large, try progressively lowering quality/scale
+  var pdf = await generatePDFFromElement(
+      element,
+      "resume.pdf",
+      options
+  );
+
+  var blob = pdf.output("blob");
+
   if (blob.size > SIZE_LIMIT_MB * MB) {
-    // Lower quality first
-    pdf = await generatePDFFromElement(element, 'resume.pdf', { ...options, quality: 0.7 });
-    blob = pdf.output('blob');
+    pdf = await generatePDFFromElement(
+        element,
+        "resume.pdf",
+        { quality: 0.75, scale: 1.8 }
+    );
+    blob = pdf.output("blob");
   }
+
   if (blob.size > SIZE_LIMIT_MB * MB) {
-    // Lower quality and scale as last resort
-    pdf = await generatePDFFromElement(element, 'resume.pdf', { ...options, quality: 0.6, scale: 1.4 });
-    blob = pdf.output('blob');
+    pdf = await generatePDFFromElement(
+        element,
+        "resume.pdf",
+        { quality: 0.65, scale: 1.4 }
+    );
+    blob = pdf.output("blob");
   }
 
   return blob;
 };
 
-export const downloadPDF = async (element, filename = 'resume.pdf', options = {}) => {
-  const pdf = await generatePDFFromElement(element, filename, options);
-  pdf.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
+/* ===========================
+   DIRECT DOWNLOAD
+=========================== */
+export const downloadPDF = async function (
+    element,
+    filename,
+    options
+) {
+  if (!filename) filename = "resume.pdf";
+  if (!options) options = {};
+
+  var pdf = await generatePDFFromElement(
+      element,
+      filename,
+      options
+  );
+
+  pdf.save(
+      filename.endsWith(".pdf")
+          ? filename
+          : filename + ".pdf"
+  );
 };
