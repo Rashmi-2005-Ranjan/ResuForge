@@ -76,18 +76,18 @@ export const DUMMY_RESUME_DATA = {
   profileInfo: {
     profileImg: null,
     previewUrl: "",
-    fullName: "Bushan SC",
-    designation: "Senior Software Engineer",
+    fullName: "Rashmi Ranjan",
+    designation: "Software Developer",
     summary:
       "Passionate and results-driven developer with 8+ years of experience building scalable web applications using modern technologies like Java, Spring Boot, Microservices, AWS.",
   },
   contactInfo: {
-    email: "bushansc@gmail.com",
+    email: "rashmiranjandev@gmail.com",
     phone: "+9874561230",
     location:'Banglore, India',
-    linkedin: "https://linkedin.com/in/bushan-sc",
-    github: "https://github.com/scbushan05",
-    website: "https://youtube.com/channel/UCff5tZ-js4bu68GQB_EhW9w",
+    linkedin: "https://www.linkedin.com/in/rashmi-ranjan-dev/",
+    github: "https://github.com/Rashmi-2005-Ranjan",
+    website: "https://portfolio-eight-chi-63.vercel.app/",
   },
   workExperience: [
     {
@@ -100,7 +100,7 @@ export const DUMMY_RESUME_DATA = {
     },
     {
       company: "Cardinal Health India International",
-      role: "Senior Developer",
+      role: "Junior Developer",
       startDate: "2020-01",
       endDate: "2022-01",
       description:
@@ -124,7 +124,7 @@ export const DUMMY_RESUME_DATA = {
     },
     {
       degree: "Bachelors in Computer Science",
-      institution: "Kuvempu University",
+      institution: "LLM University",
       startDate: "2010-08",
       endDate: "2013-06",
     },
@@ -147,20 +147,20 @@ export const DUMMY_RESUME_DATA = {
       title: "Prescription Management",
       description:
         "ply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make.",
-      github: "https://github.com/scbushan05/prescription-manager",
+      github: "https://github.com/Rashmi-2005-Ranjan",
     },
     {
       title: "Campaign Management",
       description:
         "ply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make.",
-      liveDemo: "https://github.com/scbushan05/campaign-manager",
+      liveDemo: "https://github.com/Rashmi-2005-Ranjan",
     },
     {
       title: "Analytics Dashboard",
       description:
         "ply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make.",
-      github: "https://github.com/scbushan05/analytics-dashboard",
-      liveDemo: "https://analytics-dashboard.dev",
+      github: "https://github.com/Rashmi-2005-Ranjan",
+      liveDemo: "https://analyticsdashboard.dev",
     },
   ],
   certifications: [
@@ -178,7 +178,7 @@ export const DUMMY_RESUME_DATA = {
   languages: [
     { name: "English", progress: 100 },
     { name: "Hindi", progress: 70 },
-    { name: "Kannada", progress: 40 },
+    { name: "Odia", progress: 40 },
   ],
-  interests: ["Cycling", "Content Creation", "Teaching"],
+  interests: ["Cycling", "Coding", "Reading", "Traveling"],
 };
