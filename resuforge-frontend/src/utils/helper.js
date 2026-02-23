@@ -1,111 +1,135 @@
-import moment from 'moment'
-import html2canvas from "html2canvas";
+import moment from "moment";
+import {toJpeg} from "html-to-image";
 
+/* -----------------------------
+   Email validation
+-------------------------------- */
 export const validateEmail = (email) => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
 };
 
-// get lightest average color
+/* -----------------------------
+   Get lightest average RGB color from image
+-------------------------------- */
 export const getLightColorFromImage = (imageUrl) => {
-  return new Promise((resolve, reject) => {
-    // Check if imageUrl is valid
-    if (!imageUrl || typeof imageUrl !== 'string') {
-      return reject(new Error('Invalid image URL'));
-    }
-
-    const img = new Image();
-
-    // If not a base64 string, set crossOrigin (important for CORS)
-    if (!imageUrl.startsWith('data:')) {
-      img.crossOrigin = 'anonymous';
-    }
-
-    img.src = imageUrl;
-
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
-      let r = 0, g = 0, b = 0, count = 0;
-
-      for (let i = 0; i < imageData.length; i += 4) {
-        const red = imageData[i];
-        const green = imageData[i + 1];
-        const blue = imageData[i + 2];
-        const brightness = (red + green + blue) / 3;
-
-        // Only count light pixels (tweak threshold as needed)
-        if (brightness > 180) {
-          r += red;
-          g += green;
-          b += blue;
-          count++;
+    return new Promise((resolve, reject) => {
+        if (!imageUrl || typeof imageUrl !== "string") {
+            return reject(new Error("Invalid image URL"));
         }
-      }
 
-      if (count === 0) {
-        resolve('#ffffff'); // fallback if no bright pixels found
-      } else {
-        r = Math.round(r / count);
-        g = Math.round(g / count);
-        b = Math.round(b / count);
-        resolve(`rgb(${r}, ${g}, ${b})`);
-      }
-    };
+        const img = new Image();
 
-    img.onerror = (e) => {
-      console.error('❌ Failed to load image:', e);
-      reject(new Error('Image could not be loaded or is blocked by CORS.'));
-    };
-  });
-};
+        if (!imageUrl.startsWith("data:")) {
+            img.crossOrigin = "anonymous";
+        }
 
-// Eg: Mar 2025
-export function formatYearMonth(yearMonth) {
-  return yearMonth ? moment(yearMonth, "YYYY-MM").format("MMM YYYY") : "";
-}
+        img.src = imageUrl;
 
-export const fixTailwindColors = (element) => {
-  const elements = element.querySelectorAll("*");
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
 
-  elements.forEach((el) => {
-    const style = window.getComputedStyle(el);
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
 
-    ["color", "backgroundColor", "borderColor"].forEach((prop) => {
-      const value = style[prop];
-      if (value.includes("oklch")) {
-        el.style[prop] = "#000"; // or any safe fallback
-      }
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+            let r = 0,
+                g = 0,
+                b = 0,
+                count = 0;
+
+            for (let i = 0; i < imageData.length; i += 4) {
+                const red = imageData[i];
+                const green = imageData[i + 1];
+                const blue = imageData[i + 2];
+                const brightness = (red + green + blue) / 3;
+
+                if (brightness > 180) {
+                    r += red;
+                    g += green;
+                    b += blue;
+                    count++;
+                }
+            }
+
+            if (count === 0) {
+                resolve("#ffffff");
+            } else {
+                resolve(
+                    `rgb(${Math.round(r / count)}, ${Math.round(
+                        g / count
+                    )}, ${Math.round(b / count)})`
+                );
+            }
+        };
+
+        img.onerror = () => {
+            reject(new Error("Image could not be loaded (CORS or network issue)."));
+        };
     });
-  });
 };
 
-// convert component to image
-export async function captureElementAsImage(element) {
-  if (!element) throw new Error("No element provided");
+/* -----------------------------
+   Format YYYY-MM → MMM YYYY
+-------------------------------- */
+export const formatYearMonth = (yearMonth) => {
+    return yearMonth
+        ? moment(yearMonth, "YYYY-MM").format("MMM YYYY")
+        : "";
+};
 
-  const canvas = await html2canvas(element);
-  return canvas.toDataURL("image/png");
-}
+/* -----------------------------
+   SAFETY NET (kept, but not primary fix)
+-------------------------------- */
+export const fixTailwindColors = (rootElement) => {
+    if (!rootElement) return;
 
-// Utility to convert base64 data URL to a File object
+    rootElement.querySelectorAll("*").forEach((el) => {
+        const style = window.getComputedStyle(el);
+
+        [
+            "color",
+            "backgroundColor",
+            "borderColor",
+            "outlineColor",
+            "textDecorationColor",
+            "fill",
+            "stroke",
+        ].forEach((prop) => {
+            const value = style[prop];
+            if (
+                typeof value === "string" &&
+                (value.includes("oklch") || value.includes("oklab"))
+            ) {
+                el.style[prop] = "rgb(0,0,0)";
+            }
+        });
+    });
+};
+
+export const captureElementAsImage = async (element) => {
+    if (!element) throw new Error("No element provided");
+
+    return await toJpeg(element, {
+        backgroundColor: "#ffffff",
+        quality: 0.45,      // reduces size
+        pixelRatio: 0.8,     //prevents huge images
+    });
+};/* -----------------------------
+   Convert base64 → File
+-------------------------------- */
 export const dataURLtoFile = (dataUrl, fileName) => {
-  const arr = dataUrl.split(",");
-  const mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
+    const arr = dataUrl.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    const u8arr = new Uint8Array(bstr.length);
 
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
+    for (let i = 0; i < bstr.length; i++) {
+        u8arr[i] = bstr.charCodeAt(i);
+    }
 
-  return new File([u8arr], fileName, { type: mime });
+    return new File([u8arr], fileName, {type: mime});
 };
