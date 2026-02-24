@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Mail,
-  Phone,
-  MapPin,
-  Rss,
-  Github,
-  User,
-  Linkedin,
+    Mail,
+    Phone,
+    MapPin,
+    Rss,
+    Github,
+    User,
+    Linkedin,
 } from "lucide-react";
 import ContactInfo from "../ResumeSections/ContactInfo";
 import EducationInfo from "../ResumeSections/EducationInfo";
@@ -17,238 +17,230 @@ import ProjectInfo from "../ResumeSections/ProjectInfo";
 import SkillSection from "../ResumeSections/SkillSection";
 import CertificationInfo from "../ResumeSections/CertificationInfo";
 
-const DEFAULT_THEME = ["#EBFDFF", "#A1F4FD", "#CEFAFE", "#00B8DB", "#4A5565"];
+const DEFAULT_THEME = ["#1E293B", "#1E293B", "#1E293B", "#1E293B", "#1E293B"];
 
 const Title = ({ text, color }) => {
-  return (
-    <div className="relative w-fit mb-2.5">
-      <span
-        className="absolute bottom-0 left-0 w-full h-2"
-        style={{ backgroundColor: color }}
-      ></span>
-      <h2 className={`relative text-sm font-bold`}>{text}</h2>
-    </div>
-  );
+    return (
+        <div className="flex items-center gap-2 mb-3">
+            <div className="w-1 h-4 rounded-full shrink-0" style={{ backgroundColor: color }} />
+            <h2
+                className="text-[10.5px] font-bold uppercase tracking-[0.18em] whitespace-nowrap"
+                style={{ color: "#1E293B" }}
+            >
+                {text}
+            </h2>
+            <div className="flex-1 h-px opacity-20" style={{ backgroundColor: color }} />
+        </div>
+    );
 };
 
 const TemplateOne = ({ resumeData, colorPalette, containerWidth }) => {
-  const themeColors = colorPalette?.length > 0 ? colorPalette : DEFAULT_THEME;
+    const themeColors = colorPalette?.length > 0 ? colorPalette : DEFAULT_THEME;
+    const resumeRef = useRef(null);
+    const [baseWidth, setBaseWidth] = useState(800);
+    const [scale, setScale] = useState(1);
 
-  const resumeRef = useRef(null);
-  const [baseWidth, setBaseWidth] = useState(800); // Default value
-  const [scale, setScale] = useState(1);
+    useEffect(() => {
+        const actualBaseWidth = resumeRef.current.offsetWidth;
+        setBaseWidth(actualBaseWidth);
+        setScale(containerWidth / baseWidth);
+    }, [containerWidth]);
 
-  useEffect(() => {
-    // Calculate the scale factor based on the container width
-    const actualBaseWidth = resumeRef.current.offsetWidth;
-    setBaseWidth(actualBaseWidth); // Get the actual base width
-    setScale(containerWidth / baseWidth);
-  }, [containerWidth]);
-
-  return (
-    <div
-      ref={resumeRef}
-      className="p-3 bg-white"
-      style={{
-        transform: containerWidth > 0 ? `scale(${scale})` : "none",
-        transformOrigin: "top left",
-        width: containerWidth > 0 ? `${baseWidth}px` : "auto", // Keep the original size so scaling works correctly
-        height: "auto",
-      }}
-    >
-      <div className="grid grid-cols-12 gap-8">
+    return (
         <div
-          className="col-span-4 py-10"
-          style={{ backgroundColor: themeColors[0] }}
+            ref={resumeRef}
+            style={{
+                transform: containerWidth > 0 ? `scale(${scale})` : "none",
+                transformOrigin: "top left",
+                width: containerWidth > 0 ? `${baseWidth}px` : "auto",
+                height: "auto",
+                backgroundColor: "#ffffff",
+            }}
         >
-          <div className="flex flex-col items-center px-2">
-            <div
-              className="w-[100px] h-[100px] max-w-[110px] max-h-[110px] rounded-full flex items-center justify-center"
-              style={{ backgroundColor: themeColors[1] }}
-            >
-              {resumeData.profileInfo.profilePreviewUrl ? (
-                <img
-                  src={resumeData.profileInfo.profilePreviewUrl}
-                  className="w-[90px] h-[90px] rounded-full"
-                />
-              ) : (
-                <div
-                  className="w-[90px] h-[90px] flex items-center justify-center text-5xl rounded-full"
-                  style={{ color: themeColors[4] }}
-                >
-                  <User />
-                </div>
-              )}
-            </div>
+            <div className="grid grid-cols-12 min-h-full">
 
-            <h2 className="text-xl font-bold mt-3">
-              {resumeData.profileInfo.fullName}
-            </h2>
-            <p className="text-sm text-center">
-              {resumeData.profileInfo.designation}
-            </p>
-          </div>
+                {/* Left Sidebar */}
+                <div className="col-span-4 py-8 flex flex-col px-4">
 
-          <div className="my-6 mx-6">
-            <div className="flex flex-col gap-4">
-              <ContactInfo
-                icon={<MapPin />}
-                iconBG={themeColors[2]}
-                value={resumeData.contactInfo.location}
-              />
-
-              <ContactInfo
-                icon={<Mail />}
-                iconBG={themeColors[2]}
-                value={resumeData.contactInfo.email}
-              />
-
-              <ContactInfo
-                icon={<Phone />}
-                iconBG={themeColors[2]}
-                value={resumeData.contactInfo.phone}
-              />
-
-              {resumeData.contactInfo.linkedin && (
-                <ContactInfo
-                  icon={<Linkedin />}
-                  iconBG={themeColors[2]}
-                  value={resumeData.contactInfo.linkedin}
-                />
-              )}
-
-              {resumeData.contactInfo.github && (
-                <ContactInfo
-                  icon={<Github />}
-                  iconBG={themeColors[2]}
-                  value={resumeData.contactInfo.github}
-                />
-              )}
-
-              <ContactInfo
-                icon={<Rss />}
-                iconBG={themeColors[2]}
-                value={resumeData.contactInfo.website}
-              />
-            </div>
-
-            <div className="mt-5">
-              <Title text="Education" color={themeColors[1]} />
-
-              {resumeData.education.map((data, index) => (
-                <EducationInfo
-                  key={`education_${index}`}
-                  degree={data.degree}
-                  institution={data.institution}
-                  duration={`${formatYearMonth(
-                    data.startDate
-                  )} - ${formatYearMonth(data.endDate)}`}
-                />
-              ))}
-            </div>
-
-            <div className="mt-5">
-              <Title text="Languages" color={themeColors[1]} />
-
-              <LanguageSection
-                languages={resumeData.languages}
-                accentColor={themeColors[3]}
-                bgColor={themeColors[2]}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="col-span-8 pt-10 mr-10 pb-5">
-          <div>
-            <Title text="Professional Summary" color={themeColors[1]} />
-            <p className="text-sm font-medium">
-              {resumeData.profileInfo.summary}
-            </p>
-          </div>
-
-          <div className="mt-4">
-            <Title text="Work Experiance" color={themeColors[1]} />
-
-            {resumeData.workExperience.map((data, index) => (
-              <WorkExperience
-                key={`work_${index}`}
-                company={data.company}
-                role={data.role}
-                duration={`${formatYearMonth(
-                  data.startDate
-                )} - ${formatYearMonth(data.endDate)}`}
-                durationColor={themeColors[4]}
-                description={data.description}
-              />
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <Title text="Projects" color={themeColors[1]} />
-
-            {resumeData.projects.map((project, index) => (
-              <ProjectInfo
-                key={`project_${index}`}
-                title={project.title}
-                description={project.description}
-                githubLink={project.github}
-                liveDemoUrl={project.liveDemo}
-                bgColor={themeColors[2]}
-              />
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <Title text="Skills" color={themeColors[1]} />
-
-            <SkillSection
-              skills={resumeData.skills}
-              accentColor={themeColors[3]}
-              bgColor={themeColors[2]}
-            />
-          </div>
-
-          <div className="mt-4">
-            <Title text="Certifications" color={themeColors[1]} />
-
-            <div className="grid grid-cols-2 gap-2">
-              {resumeData.certifications.map((data, index) => (
-                <CertificationInfo
-                  key={`cert_${index}`}
-                  title={data.title}
-                  issuer={data.issuer}
-                  year={data.year}
-                  bgColor={themeColors[2]}
-                />
-              ))}
-            </div>
-          </div>
-
-          {resumeData.interests.length > 0 && resumeData.interests[0] != "" && (
-            <div className="mt-4">
-              <Title text="Interests" color={themeColors[1]} />
-
-              <div className="flex items-center flex-wrap gap-3 mt-4">
-                {resumeData.interests.map((interest, index) => {
-                  if (!interest) return null;
-                  return (
-                    <div
-                      key={`interest_${index}`}
-                      className="text-[10px] font-medium py-1 px-3 rounded-lg"
-                      style={{ backgroundColor: themeColors[2] }}
-                    >
-                      {interest}
+                    {/* Profile block */}
+                    <div className="flex flex-col items-center mb-6">
+                        <div className="w-[96px] h-[96px] rounded-full overflow-hidden flex items-center justify-center mb-3 border border-gray-300">
+                            {resumeData.profileInfo.profilePreviewUrl ? (
+                                <img
+                                    src={resumeData.profileInfo.profilePreviewUrl}
+                                    className="w-full h-full object-cover object-top"
+                                    alt="Profile"
+                                />
+                            ) : (
+                                <User className="w-10 h-10" style={{ color: "#1E293B" }} />
+                            )}
+                        </div>
+                        <h2 className="text-[15px] font-extrabold text-center leading-snug" style={{ color: "#1E293B" }}>
+                            {resumeData.profileInfo.fullName}
+                        </h2>
+                        <p className="text-[11px] font-semibold text-center mt-0.5" style={{ color: "#1E293B" }}>
+                            {resumeData.profileInfo.designation}
+                        </p>
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* Contact info */}
+                    <div className="flex flex-col gap-3 mb-6">
+                        {resumeData.contactInfo.location && (
+                            <ContactInfo icon={<MapPin className="w-4 h-4 text-[#1E293B]" />} iconBG="#E5E7EB" value={resumeData.contactInfo.location} textColor="#1E293B"/>
+                        )}
+                        {resumeData.contactInfo.email && (
+                            <ContactInfo icon={<Mail className="w-4 h-4 text-[#1E293B]" />} iconBG="#E5E7EB" value={resumeData.contactInfo.email} textColor="#1E293B"/>
+                        )}
+                        {resumeData.contactInfo.phone && (
+                            <ContactInfo icon={<Phone className="w-4 h-4 text-[#1E293B]" />} iconBG="#E5E7EB" value={resumeData.contactInfo.phone} textColor="#1E293B"/>
+                        )}
+                        {resumeData.contactInfo.linkedIn && (
+                            <ContactInfo icon={<Linkedin className="w-4 h-4 text-[#1E293B]" />} iconBG="#E5E7EB" value={resumeData.contactInfo.linkedIn} textColor="#1E293B"/>
+                        )}
+                        {resumeData.contactInfo.github && (
+                            <ContactInfo icon={<Github className="w-4 h-4 text-[#1E293B]" />} iconBG="#E5E7EB" value={resumeData.contactInfo.github} textColor="#1E293B"/>
+                        )}
+                        {resumeData.contactInfo.website && (
+                            <ContactInfo icon={<Rss className="w-4 h-4 text-[#1E293B]" />} iconBG="#E5E7EB" value={resumeData.contactInfo.website} textColor="#1E293B"/>
+                        )}
+                    </div>
+
+                    {/* Education */}
+                    {resumeData.educations?.length > 0 && (
+                        <div className="mb-5">
+                            <Title text="Education" color="#1E293B" />
+                            {resumeData.educations.map((data, index) => (
+                                <EducationInfo
+                                    key={`education_${index}`}
+                                    degree={data.degree}
+                                    institution={data.institution}
+                                    duration={`${formatYearMonth(data.startDate)} - ${formatYearMonth(data.endDate)}`}
+                                    textColor="#1E293B"
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Languages */}
+                    {resumeData.languages?.length > 0 && (
+                        <div>
+                            <Title text="Languages" color="#1E293B" />
+                            <LanguageSection
+                                languages={resumeData.languages}
+                                accentColor="#1E293B"
+                                bgColor="#E5E7EB"
+                                textColor="#1E293B"
+                            />
+                        </div>
+                    )}
+                </div>
+
+                {/* Right Content */}
+                <div className="col-span-8 px-7 py-8 space-y-5">
+
+                    {/* Summary */}
+                    {resumeData.profileInfo.summary && (
+                        <div>
+                            <Title text="Professional Summary" color="#1E293B" />
+                            <p className="text-[11.5px] leading-relaxed font-medium" style={{ color: "#1E293B" }}>
+                                {resumeData.profileInfo.summary}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Work Experience */}
+                    {resumeData.workExperience?.length > 0 && (
+                        <div>
+                            <Title text="Work Experience" color="#1E293B" />
+                            {resumeData.workExperience?.map((data, index) => (
+                                <WorkExperience
+                                    key={`work_${index}`}
+                                    company={data.company}
+                                    role={data.role}
+                                    duration={`${formatYearMonth(data.startDate)} - ${formatYearMonth(data.endDate)}`}
+                                    durationColor="#000000"
+                                    description={data.description}
+                                    textColor="#000000"
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Projects */}
+                    {resumeData.projects?.length > 0 && (
+                        <div>
+                            <Title text="Projects" color="#1E293B" />
+                            {resumeData.projects.map((project, index) => (
+                                <ProjectInfo
+                                    key={`project_${index}`}
+                                    title={project.title}
+                                    description={project.description}
+                                    githubLink={project.githubLink}
+                                    liveDemoUrl={project.liveDemo}
+                                    bgColor="#E5E7EB"
+                                    textColor="#1E293B"
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Skills */}
+                    {resumeData.skills?.length > 0 && (
+                        <div>
+                            <Title text="Skills" color="#1E293B" />
+                            <SkillSection
+                                skills={resumeData.skills}
+                                accentColor="#1E293B"
+                                bgColor="#E5E7EB"
+                                textColor="#1E293B"
+                            />
+                        </div>
+                    )}
+
+                    {/* Certifications */}
+                    {resumeData.certifications?.length > 0 && (
+                        <div>
+                            <Title text="Certifications" color="#1E293B" />
+                            <div className="grid grid-cols-2 gap-2">
+                                {resumeData.certifications.map((data, index) => (
+                                    <CertificationInfo
+                                        key={`cert_${index}`}
+                                        title={data.title}
+                                        issuer={data.issuer}
+                                        year={data.year}
+                                        bgColor="#E5E7EB"
+                                        textColor="#1E293B"
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Interests */}
+                    {resumeData.interests?.length > 0 && resumeData.interests[0] !== "" && (
+                        <div>
+                            <Title text="Interests" color="#1E293B" />
+                            <div className="flex flex-wrap gap-2 mt-1">
+                                {resumeData.interests.map((interest, index) => (
+                                    <span
+                                        key={`interest_${index}`}
+                                        className="text-[10px] font-semibold py-1 px-3 rounded-full"
+                                        style={{
+                                            color: "#1E293B",
+                                            backgroundColor: "#E5E7EB",
+                                            border: `1px solid #1E293B33`,
+                                        }}
+                                    >
+                    {interest}
+                  </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-          )}
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default TemplateOne;
