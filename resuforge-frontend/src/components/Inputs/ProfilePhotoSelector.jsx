@@ -1,20 +1,17 @@
-import React, { useRef, useState } from 'react'
 import { User, Upload, Trash } from "lucide-react";
+import {useRef, useState} from "react";
 
-const ProfilePhotoSelector = ({image, setImage, preview, setPreview}) => {
+const ProfilePhotoSelector = ({ image, setImage, preview, setPreview }) => {
   const inputRef = useRef(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Update the image state
       setImage(file);
-
-      // Generate preview URL from the file
       const preview = URL.createObjectURL(file);
-      if(setPreview){
-        setPreview(preview)
+      if (setPreview) {
+        setPreview(preview);
       }
       setPreviewUrl(preview);
     }
@@ -23,55 +20,60 @@ const ProfilePhotoSelector = ({image, setImage, preview, setPreview}) => {
   const handleRemoveImage = () => {
     setImage(null);
     setPreviewUrl(null);
-
-    if(setPreview){
-      setPreview(null)
+    if (setPreview) {
+      setPreview(null);
     }
   };
 
   const onChooseFile = () => {
     inputRef.current.click();
   };
+
   return (
-   <div className="flex justify-center mb-6">
-      <input
-        type="file"
-        accept="image/*"
-        ref={inputRef}
-        onChange={handleImageChange}
-        className="hidden"
-      />
+      <div className="flex justify-center mb-6">
+        <input
+            type="file"
+            accept="image/*"
+            ref={inputRef}
+            onChange={handleImageChange}
+            className="hidden"
+        />
 
-      {!image ? (
-        <div className="w-20 h-20 flex items-center justify-center bg-purple-50 rounded-full relative cursor-pointer">
-          <User className="text-4xl text-purple-500" />
+        {!image ? (
+            <div className="relative group">
+              <div className="w-24 h-24 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-700 rounded-full relative cursor-pointer group-hover:border-purple-500 transition-all duration-300">
+                <User className="w-10 h-10 text-slate-500 group-hover:text-purple-400 transition-colors" />
+              </div>
 
-          <button
-            type="button"
-            className="w-8 h-8 flex items-center justify-center bg-linear-to-r from-purple-500/85 to-purple-700 text-white rounded-full absolute -bottom-1 -right-1 cursor-pointer"
-            onClick={onChooseFile}
-          >
-            <Upload />
-          </button>
-        </div>
-      ) : (
-        <div className="relative">
-          <img
-            src={preview || previewUrl}
-            alt="profile photo"
-            className="w-20 h-20 rounded-full object-cover"
-          />
-          <button
-            type="button"
-            className="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full absolute -bottom-1 -right-1 cursor-pointer"
-            onClick={handleRemoveImage}
-          >
-            <Trash />
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
+              <button
+                  type="button"
+                  className="w-9 h-9 flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full absolute -bottom-1 -right-1 cursor-pointer shadow-lg hover:shadow-purple-500/50 transition-all duration-300 group-hover:scale-110"
+                  onClick={onChooseFile}
+              >
+                <Upload className="w-4 h-4" />
+              </button>
+            </div>
+        ) : (
+            <div className="relative group">
+              <div className="w-24 h-24 rounded-full border-2 border-purple-500 shadow-lg shadow-purple-500/30 overflow-hidden">
+                <img
+                    src={preview || previewUrl}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                />
+              </div>
 
-export default ProfilePhotoSelector
+              <button
+                  type="button"
+                  className="w-9 h-9 flex items-center justify-center bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white rounded-full absolute -bottom-1 -right-1 cursor-pointer shadow-lg hover:shadow-red-500/50 transition-all duration-300 group-hover:scale-110"
+                  onClick={handleRemoveImage}
+              >
+                <Trash className="w-4 h-4" />
+              </button>
+            </div>
+        )}
+      </div>
+  );
+};
+
+export default ProfilePhotoSelector;
