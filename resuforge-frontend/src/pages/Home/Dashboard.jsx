@@ -177,7 +177,7 @@ const Dashboard = () => {
                         </p>
                         <button
                             onClick={() => setOpenCreateModal(true)}
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/50"
+                            className="inline-flex cursor-pointer items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/50"
                         >
                             <CirclePlus className="w-5 h-5"/>
                             <span>Create Your First Resume</span>
@@ -189,7 +189,7 @@ const Dashboard = () => {
             {/* Mobile FAB */}
             <button
                 onClick={() => setOpenCreateModal(true)}
-                className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-xl hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 flex items-center justify-center z-40"
+                className="md:hidden cursor-pointer fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-xl hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 flex items-center justify-center z-40"
             >
                 <CirclePlus className="w-6 h-6"/>
             </button>
