@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
-import { UserContext } from "../../context/userContext";
-import { useNavigate } from "react-router-dom";
-import { LogOut, Crown, User } from "lucide-react";
+import React, {useContext} from "react";
+import {UserContext} from "../../context/userContext";
+import {useNavigate} from "react-router-dom";
+import {LogOut, Crown, User} from "lucide-react";
 
 const ProfileInfoCard = () => {
-    const { user, clearUser } = useContext(UserContext);
+    const {user, clearUser} = useContext(UserContext);
     const navigate = useNavigate();
 
     const handelLogout = () => {
@@ -28,8 +28,9 @@ const ProfileInfoCard = () => {
                         }}
                     />
                     {user.subscriptionPlan === 'premium' && (
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center border-2 border-slate-950">
-                            <Crown className="w-3 h-3 text-white" />
+                        <div
+                            className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center border-2 border-slate-950">
+                            <Crown className="w-3 h-3 text-white"/>
                         </div>
                     )}
                 </div>
@@ -41,12 +42,14 @@ const ProfileInfoCard = () => {
                             {user.name || "User"}
                         </div>
                         {user.subscriptionPlan === 'premium' ? (
-                            <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1">
-                                <Crown className="w-3 h-3" />
+                            <div
+                                className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1">
+                                <Crown className="w-3 h-3"/>
                                 <span>Premium</span>
                             </div>
                         ) : (
-                            <div className="bg-slate-700/50 border border-slate-600 text-slate-300 px-2 py-0.5 rounded-full text-xs font-medium">
+                            <div
+                                className="bg-slate-700/50 border border-slate-600 text-slate-300 px-2 py-0.5 rounded-full text-xs font-medium">
                                 Free
                             </div>
                         )}
@@ -55,18 +58,18 @@ const ProfileInfoCard = () => {
                         className="text-purple-400 hover:text-purple-300 text-xs font-medium cursor-pointer transition-colors flex items-center gap-1 group/logout"
                         onClick={handelLogout}
                     >
-                        <LogOut className="w-3 h-3 group-hover/logout:translate-x-0.5 transition-transform" />
+                        <LogOut className="w-3 h-3 group-hover/logout:translate-x-0.5 transition-transform"/>
                         <span>Logout</span>
                     </button>
                 </div>
 
                 {/* Mobile Logout Button */}
                 <button
-                    className="md:hidden p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                    className="md:hidden p-2 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                     onClick={handelLogout}
                     title="Logout"
                 >
-                    <LogOut className="w-5 h-5 text-slate-400 hover:text-purple-400 transition-colors" />
+                    <LogOut className="w-5 h-5 text-slate-400 hover:text-purple-400 transition-colors"/>
                 </button>
             </div>
         )
