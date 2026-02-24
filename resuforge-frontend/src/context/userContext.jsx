@@ -1,64 +1,64 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, {createContext, useState, useEffect} from "react";
 import axiosInstance from "../utils/axiosInstance";
-import { API_PATHS } from "../utils/apiPaths";
+import {API_PATHS} from "../utils/apiPaths";
 
 export const UserContext = createContext();
 
-const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // New state to track loading
+const UserProvider = ({children}) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // New state to track loading
 
-  useEffect(() => {
-    if (user) return;
+    useEffect(() => {
+        if (user) return;
 
-    const accessToken = localStorage.getItem("token");
-    if (!accessToken) {
-      setLoading(false);
-      return;
-    }
+        const accessToken = localStorage.getItem("token");
+        if (!accessToken) {
+            setLoading(false);
+            return;
+        }
 
-    const fetchUser = async () => {
-      try {
-        const response = await axiosInstance.get(API_PATHS.AUTH.PROFILE);
-        setUser(response.data);
-      } catch (error) {
-        console.error("User not authenticated", error);
-        clearUser();
-      } finally {
+        const fetchUser = async () => {
+            try {
+                const response = await axiosInstance.get(API_PATHS.AUTH.PROFILE);
+                setUser(response.data);
+            } catch (error) {
+                console.error("User not authenticated", error);
+                clearUser();
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    const updateUser = (userData) => {
+        setUser(userData);
+        localStorage.setItem("token", userData.token); // Save token
         setLoading(false);
-      }
     };
 
-    fetchUser();
-  }, []);
+    const refreshUser = async () => {
+        try {
+            const response = await axiosInstance.get(API_PATHS.AUTH.PROFILE);
+            setUser(response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Failed to refresh user", error);
+            throw error;
+        }
+    };
 
-  const updateUser = (userData) => {
-    setUser(userData);
-    localStorage.setItem("token", userData.token); // Save token
-    setLoading(false);
-  };
+    const clearUser = () => {
+        setUser(null);
+        localStorage.removeItem("token");
+    };
 
-  const refreshUser = async () => {
-    try {
-      const response = await axiosInstance.get(API_PATHS.AUTH.PROFILE);
-      setUser(response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to refresh user", error);
-      throw error;
-    }
-  };
-
-  const clearUser = () => {
-    setUser(null);
-    localStorage.removeItem("token");
-  };
-
-  return (
-    <UserContext.Provider value={{ user, loading, updateUser, clearUser, refreshUser }}>
-      {children}
-    </UserContext.Provider>
-  );
+    return (
+        <UserContext.Provider value={{user, loading, updateUser, clearUser, refreshUser}}>
+            {children}
+        </UserContext.Provider>
+    );
 };
 
 export default UserProvider;
