@@ -22,9 +22,9 @@ import ContactInfoForm from "./Forms/ContactInfoForm";
 import WorkExperienceForm from "./Forms/WorkExperienceForm";
 import EducationDetailsForm from "./Forms/EducationDetailsForm";
 import SkillsInfoForm from "./Forms/SkillsInfoForm";
-import ProjectsDetailFrom from "./Forms/ProjectsDetailFrom";
-import CertificationInfoFrom from "./Forms/CertificationInfoFrom";
-import AdditionalInfoFrom from "./Forms/AdditionalInfoFrom";
+import ProjectsDetailForm from "./Forms/ProjectsDetailForm.jsx";
+import CertificationInfoForm from "./Forms/CertificationInfoForm.jsx";
+import AdditionalInfoForm from "./Forms/AdditionalInfoForm.jsx";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import {captureElementAsImage, dataURLtoFile} from "../../utils/helper";
 import ThemeSelector from "./ThemeSelector";
@@ -200,17 +200,17 @@ const EditResume = () => {
                                        addArrayItem={(newItem) => addArrayItem("skills", newItem)}
                                        removeArrayItem={(index) => removeArrayItem("skills", index)}/>;
             case "projects":
-                return <ProjectsDetailFrom projectInfo={resumeData?.projects}
+                return <ProjectsDetailForm projectInfo={resumeData?.projects}
                                            updateArrayItem={(index, key, value) => updateArrayItem("projects", index, key, value)}
                                            addArrayItem={(newItem) => addArrayItem("projects", newItem)}
                                            removeArrayItem={(index) => removeArrayItem("projects", index)}/>;
             case "certifications":
-                return <CertificationInfoFrom certifications={resumeData?.certifications}
+                return <CertificationInfoForm certifications={resumeData?.certifications}
                                               updateArrayItem={(index, key, value) => updateArrayItem("certifications", index, key, value)}
                                               addArrayItem={(newItem) => addArrayItem("certifications", newItem)}
                                               removeArrayItem={(index) => removeArrayItem("certifications", index)}/>;
             case "additionalInfo":
-                return <AdditionalInfoFrom languages={resumeData.languages} interests={resumeData.interests}
+                return <AdditionalInfoForm languages={resumeData.languages} interests={resumeData.interests}
                                            updateArrayItem={(section, index, key, value) => updateArrayItem(section, index, key, value)}
                                            addArrayItem={(section, newItem) => addArrayItem(section, newItem)}
                                            removeArrayItem={(section, index) => removeArrayItem(section, index)}/>;
