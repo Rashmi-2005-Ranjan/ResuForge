@@ -1,7 +1,7 @@
 import React from "react";
 import {Plus, Trash2, FolderGit2, Github, Globe, FileText} from "lucide-react";
 
-const ProjectsDetailFrom = ({
+const ProjectsDetailForm = ({
                                 projectInfo,
                                 updateArrayItem,
                                 addArrayItem,
@@ -149,4 +149,4 @@ const ProjectsDetailFrom = ({
     );
 };
 
-export default ProjectsDetailFrom;
+export default ProjectsDetailForm;
